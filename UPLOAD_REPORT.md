@@ -6,8 +6,8 @@
 - 已补充 `.gitignore` 和根目录 `README.md`。
 - 主工程 README 已去除本机绝对路径示例。
 - 未修改核心播放/传输功能代码。
-- GitHub 仓库创建和推送状态：本环境缺少可用创建/推送通道，待补 GitHub CLI 或可写 GitHub 连接器。
-- 本地提交：`5f2a461`，提交信息 `Initial STM32 WAV player project`。
+- GitHub 仓库创建和推送状态：已推送到私有仓库。
+- 本地初始提交：`0b8a99f`，提交信息 `Initial STM32 WAV player project`。
 
 ## 项目路径
 
@@ -23,13 +23,15 @@ https://github.com/cakedangao6-spec/stm32-wav-player
 
 目标仓库名：`stm32-wav-player`  
 目标可见性：私有仓库  
-当前状态：目标仓库尚不存在，GitHub 连接器返回 `NOT_FOUND`。
+当前状态：已配置 `origin` 并推送 `master` 分支。  
+远端验证：`git ls-remote --heads origin` 返回 `0b8a99fe5e15e1629276e230654ea0e5be4b30fa refs/heads/master`。
 
-## 当前阻塞
+## 远端验证说明
 
-- 本机未安装 `gh`，无法用 GitHub CLI 创建私有仓库。
-- 当前 GitHub 连接器可读取用户资料，但没有安装账号/可写仓库，也没有暴露创建新仓库的工具。
-- 因此本次已完成本地整理和提交，但还未完成远端私有仓库创建与推送。
+- 已通过 Git 推送结果确认：`master -> master`。
+- 已通过 `git ls-remote --heads origin` 确认远端分支存在。
+- 已通过 `git ls-tree --name-only origin/master` 确认远端包含 `.gitignore`、`README.md`、`UPLOAD_REPORT.md`、`STM32_MP3_WAV播放器/`、两个拆分学习工程和 `工具/`。
+- GitHub 连接器仍无法读取该私有仓库，返回 `NOT_FOUND`，因此本报告以 Git 远端验证结果为准。
 
 ## 本次准备上传的内容
 
