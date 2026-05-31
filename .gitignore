@@ -1,0 +1,54 @@
+# Python / local environments
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Node / generated tool dependencies
+node_modules/
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Keil uVision generated files
+**/Objects/
+**/Listings/
+**/*.uvguix.*
+**/*.uvgui.*
+**/*.uvgui
+**/*.uvguix
+**/*.dep
+**/*.crf
+**/*.d
+**/*.o
+**/*.obj
+**/*.lst
+**/*.map
+**/*.lnp
+**/*.axf
+**/*.elf
+**/*.hex
+**/*.bin
+**/*.build_log.htm
+
+# Logs and temporary verification output
+**/日志/
+**/docx_render/
+验证产物/
+*.log
+*.tmp
+*.bak
+
+# Local test media and bundled external tools
+音频素材/
+工具/XCOM V2.6/
+
+# Historical local backups
+**/归档/
