@@ -1,4 +1,15 @@
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\keil5\ARM\ARMCC\Bin'
 Build target 'Target 1'
-".\Objects\Project.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+compiling App.c...
+Hardware\App.c(13): warning:  #177-D: variable "app_page_buf"  was declared but never referenced
+  static uint8_t app_page_buf[APP_PAGE_SIZE];	//�����������������256����������Flash
+Hardware\App.c(14): warning:  #177-D: variable "app_page_index"  was declared but never referenced
+  static uint16_t app_page_index = 0;			//�������������������������
+Hardware\App.c(15): warning:  #177-D: variable "app_flash_addr"  was declared but never referenced
+  static uint32_t app_flash_addr = 0;			//������������Flash�����
+Hardware\App.c: 3 warnings, 0 errors
+linking...
+Program Size: Code=8792 RO-data=1788 RW-data=52 ZI-data=1380  
+".\Objects\Project.axf" - 0 Error(s), 3 Warning(s).
 Build Time Elapsed:  00:00:01

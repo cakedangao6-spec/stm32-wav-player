@@ -9,6 +9,11 @@ static uint32_t app_received_size = 0;	//记录当前已经接收到的数据字
 static uint8_t app_write_ready = 0;		//记录是否已经收到有效的WRITE:size命令
 static App_State_t app_state = APP_STATE_IDLE;	//记录当前处于命令空闲状态还是数据接收状态
 
+#define APP_PAGE_SIZE 256					//W25Q64页大小
+static uint8_t app_page_buf[APP_PAGE_SIZE];	//页缓冲区，攒够256字节写入Flash
+static uint16_t app_page_index = 0;			//页缓冲区当前写入位置
+static uint32_t app_flash_addr = 0;			//当前写入的Flash地址
+
 /**
   * @brief  获取APP当前接收状态
   * @param  无
