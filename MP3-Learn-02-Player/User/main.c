@@ -22,6 +22,12 @@
 #define WAV_FILE_BASE_ADDR 0UL
 #define WAV_FILE_SIZE      301810UL
 
+/**
+  * 函    数：LED 闪烁提示
+  * 参    数：times 闪烁次数
+  * 参    数：delay_ms 每次亮灭之间的延时时间
+  * 返 回 值：无
+  */
 static void LED_Blink(uint8_t times, uint32_t delay_ms)
 {
     for (uint8_t i = 0; i < times; i++) {
@@ -32,6 +38,11 @@ static void LED_Blink(uint8_t times, uint32_t delay_ms)
     }
 }
 
+/**
+  * 函    数：通过串口打印 WAV 文件信息
+  * 参    数：wav_info WAV 解析结果结构体指针
+  * 返 回 值：无
+  */
 static void Debug_PrintWavInfo(const WavInfo_t *wav_info)
 {
     char buf[64];
@@ -49,6 +60,11 @@ static void Debug_PrintWavInfo(const WavInfo_t *wav_info)
     USART1_SendString(buf);
 }
 
+/**
+  * 函    数：通过串口打印音频播放错误
+  * 参    数：error 音频播放器错误码
+  * 返 回 值：无
+  */
 static void Debug_PrintAudioError(AudioPlayerError_t error)
 {
     switch (error) {
@@ -67,6 +83,12 @@ static void Debug_PrintAudioError(AudioPlayerError_t error)
     }
 }
 
+/**
+  * 函    数：系统时钟配置
+  * 参    数：无
+  * 返 回 值：无
+  * 说    明：使用 8MHz 外部晶振，经 PLL 倍频到 72MHz
+  */
 void RCC_Configuration(void)
 {
     ErrorStatus HSEStartUpStatus;
@@ -89,6 +111,12 @@ void RCC_Configuration(void)
     }
 }
 
+/**
+  * 函    数：GPIO 初始化
+  * 参    数：无
+  * 返 回 值：无
+  * 说    明：初始化 PC13 LED 和 W25Q64 片选 PA4
+  */
 void GPIO_Configuration(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -111,6 +139,12 @@ void GPIO_Configuration(void)
     GPIO_SetBits(W25Q64_CS_PORT, W25Q64_CS_PIN);
 }
 
+/**
+  * 函    数：SPI1 初始化
+  * 参    数：无
+  * 返 回 值：无
+  * 说    明：PA5=SCK，PA6=MISO，PA7=MOSI，用于从 W25Q64 读取 WAV
+  */
 void SPI1_Configuration(void)
 {
     SPI_InitTypeDef SPI_InitStructure;
@@ -144,6 +178,11 @@ void SPI1_Configuration(void)
     SPI_Cmd(SPI1, ENABLE);
 }
 
+/**
+  * 函    数：NVIC 中断分组配置
+  * 参    数：无
+  * 返 回 值：无
+  */
 void NVIC_Configuration(void)
 {
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
@@ -156,19 +195,19 @@ int main(void)
     WavInfo_t wav_info;
     WavStatus_t wav_status;
 
-    RCC_Configuration();
-    NVIC_Configuration();
-    USART1_Init();
-    GPIO_Configuration();
-    SPI1_Configuration();
-    W25Q64_DriverInit();
+    RCC_Configuration();                   // 配置系统时钟到 72MHz
+    NVIC_Configuration();                  // 配置中断优先级分组
+    USART1_Init();                         // 初始化串口，用于输出调试日志
+    GPIO_Configuration();                  // 初始化 LED 和 W25Q64 片选引脚
+    SPI1_Configuration();                  // 初始化 SPI1，用于读取 W25Q64
+    W25Q64_DriverInit();                   // 初始化 W25Q64 驱动
 
-    OLED_Init();
-    OLED_Clear();
+    OLED_Init();                           // 初始化 OLED 显示屏
+    OLED_Clear();                          // 清屏
 
-    USART1_SendString("Learn-02 Player boot\r\n");
+    USART1_SendString("Learn-02 Player boot\r\n"); // 通过串口输出启动提示
 
-    jedec_id = W25Q64_ReadJedecID();
+    jedec_id = W25Q64_ReadJedecID();       // 读取 W25Q64 的 JEDEC ID，用于判断 Flash 是否连接正常
     OLED_ShowString(1, 1, "W25Q64:");
     if (W25Q64_Is64MbitCompatible(jedec_id)) {
         OLED_ShowString(1, 9, "OK");
@@ -179,7 +218,7 @@ int main(void)
         LED_Blink(5, 120);
     }
 
-    wav_status = WAV_ParseFromFlash(WAV_FILE_BASE_ADDR, WAV_FILE_SIZE, &wav_info);
+    wav_status = WAV_ParseFromFlash(WAV_FILE_BASE_ADDR, WAV_FILE_SIZE, &wav_info); // 从 Flash 解析 WAV 文件头
     if (wav_status != WAV_STATUS_OK) {
         USART1_SendString("WAV error: ");
         USART1_SendString(WAV_StatusString(wav_status));
@@ -193,12 +232,12 @@ int main(void)
         }
     }
 
-    Debug_PrintWavInfo(&wav_info);
+    Debug_PrintWavInfo(&wav_info);         // 串口打印采样率、位深、声道等信息
     OLED_ShowString(2, 1, "State: PLAYING  ");
     OLED_ShowString(3, 1, "PCM ready       ");
     OLED_ShowString(4, 1, "PB0 audio out   ");
 
-    if (AudioPlayer_Init(&wav_info) == 0U || AudioPlayer_Start() == 0U) {
+    if (AudioPlayer_Init(&wav_info) == 0U || AudioPlayer_Start() == 0U) { // 初始化 PWM 和采样定时器，并启动播放
         Debug_PrintAudioError(AudioPlayer_GetLastError());
         OLED_ShowString(2, 1, "State: AUDIOERR ");
         OLED_ShowString(3, 1, "Check UART log  ");
@@ -212,8 +251,8 @@ int main(void)
     USART1_SendString("Playback start\r\n");
 
     while (1) {
-        AudioPlayer_Process();
-        loop_tick++;
+        AudioPlayer_Process();             // 主循环负责给空闲音频缓冲区补充 Flash 数据
+        loop_tick++;                       // 软件计数，用于控制 LED 闪烁频率
 
         if (AudioPlayer_GetState() == AUDIO_PLAYER_DONE) {
             USART1_SendString("Playback end\r\n");
@@ -225,7 +264,7 @@ int main(void)
             }
         }
 
-        if (AudioPlayer_GetState() == AUDIO_PLAYER_ERROR) {
+        if (AudioPlayer_GetState() == AUDIO_PLAYER_ERROR) { // 如果定时中断发现欠载或读 Flash 出错，会进入错误状态
             Debug_PrintAudioError(AudioPlayer_GetLastError());
             OLED_ShowString(2, 1, "State: AUDIOERR ");
             OLED_ShowString(3, 1, "Check UART log  ");

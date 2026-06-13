@@ -12,9 +12,9 @@
 #define RING_BUF_MASK   (RING_BUF_SIZE - 1)
 
 typedef struct {
-    uint8_t  buffer[RING_BUF_SIZE];
-    volatile uint32_t head;
-    volatile uint32_t tail;
+    uint8_t  buffer[RING_BUF_SIZE];     // 实际存放数据的数组
+    volatile uint32_t head;             // 写指针，在中断或写入函数中更新
+    volatile uint32_t tail;             // 读指针，在主循环读取数据时更新
 } RingBuffer_t;
 
 void     RingBuffer_Init(RingBuffer_t *rb);
