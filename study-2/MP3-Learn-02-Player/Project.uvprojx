@@ -517,6 +517,66 @@
               <FileType>5</FileType>
               <FilePath>.\Hardware\OLED_Font.h</FilePath>
             </File>
+            <File>
+              <FileName>bsp_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\bsp_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_usart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\bsp_usart.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_w25q64.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\bsp_w25q64.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_w25q64.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\bsp_w25q64.h</FilePath>
+            </File>
+            <File>
+              <FileName>w25q64.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\w25q64.c</FilePath>
+            </File>
+            <File>
+              <FileName>w25q64.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\w25q64.h</FilePath>
+            </File>
+            <File>
+              <FileName>wav.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\wav.c</FilePath>
+            </File>
+            <File>
+              <FileName>wav.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\wav.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio_player.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\audio_player.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_player.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\audio_player.h</FilePath>
+            </File>
+            <File>
+              <FileName>ring_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\ring_buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>ring_buffer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\ring_buffer.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -526,51 +586,6 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\bsp_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_w25q64.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\bsp_w25q64.c</FilePath>
-            </File>
-            <File>
-              <FileName>w25q64.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\w25q64.c</FilePath>
-            </File>
-            <File>
-              <FileName>w25q64.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\w25q64.h</FilePath>
-            </File>
-            <File>
-              <FileName>wav.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\wav.c</FilePath>
-            </File>
-            <File>
-              <FileName>wav.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\wav.h</FilePath>
-            </File>
-            <File>
-              <FileName>audio_player.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\audio_player.c</FilePath>
-            </File>
-            <File>
-              <FileName>audio_player.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\audio_player.h</FilePath>
-            </File>
-            <File>
-              <FileName>ring_buffer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\ring_buffer.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_conf.h</FileName>
