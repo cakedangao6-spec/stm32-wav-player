@@ -5,8 +5,8 @@
 
 typedef enum
 {
-	APP_STATE_IDLE = 0,
-	APP_STATE_RECEIVING
+	APP_STATE_IDLE = 0,	//等待命令状态
+	APP_STATE_RECEIVING	//正在接收数据状态
 } App_State_t;
 
 App_State_t App_GetState(void);

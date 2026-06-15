@@ -9,7 +9,9 @@ static uint32_t app_received_size = 0;	//记录当前已经接收到的数据字
 static uint8_t app_write_ready = 0;		//记录是否已经收到有效的WRITE:size命令
 static App_State_t app_state = APP_STATE_IDLE;	//记录当前处于命令空闲状态还是数据接收状态
 
-#define APP_PAGE_SIZE 256					//W25Q64页大小
+#define APP_PAGE_SIZE 256					//W25Q64页大小(256字节)
+#define APP_SECTOR_SIZE 4096				//W25Q64扇区大小(4KB)，擦除最小单位
+#define APP_FLASH_START_ADDR 0				//数据写入Flash的起始地址
 static uint8_t app_page_buf[APP_PAGE_SIZE];	//页缓冲区，攒够256字节写入Flash
 static uint16_t app_page_index = 0;			//页缓冲区当前写入位置
 static uint32_t app_flash_addr = 0;			//当前写入的Flash地址
@@ -52,7 +54,7 @@ void App_HandleDataByte(uint8_t data)
 		/*页缓冲区已满（256字节），整页写入Flash*/
 		if (app_page_index >= APP_PAGE_SIZE)
 		{
-			W25Q64_PageProgram(app_flash_addr, app_page_buf, APP_PAGE_SIZE);
+			W25Q64_PageProgram(app_flash_addr, app_page_buf, APP_PAGE_SIZE);	//写入Flash，内部会等待写入完成
 			app_flash_addr += APP_PAGE_SIZE;	//Flash地址后移一页
 			app_page_index = 0;					//清空页下标，从头攒下一页
 		}
@@ -60,6 +62,11 @@ void App_HandleDataByte(uint8_t data)
 		/*收满WRITE:size指定的总字节数*/
 		if (app_received_size >= app_write_size)
 		{
+			/*flush页缓冲区剩余数据：不满一页也要写入Flash*/
+			if (app_page_index > 0)
+			{
+				W25Q64_PageProgram(app_flash_addr, app_page_buf, app_page_index);
+			}
 			app_state = APP_STATE_IDLE;
 			Serial_SendString("DONE\r\n");
 		}
@@ -143,7 +150,7 @@ static void App_ShowStatus(void)
   * @brief  处理一行串口命令，并根据命令内容返回响应
   * @param  line 已经以'\0'结尾的字符串命令
   * @retval 无
-  * @note   当前支持PING、HELP、WRITE:size、VERIFY、STATUS，其他命令回复UNKNOWN。
+  * @note   当前支持PING、HELP、WRITE:size、VERIFY、STATUS、READID、READBACK，其他命令回复UNKNOWN。
   */
 void App_HandleLine(char *line)
 {
@@ -171,12 +178,20 @@ void App_HandleLine(char *line)
 	}
 	else if (App_ParseWriteSize(line, &write_size))
 	{
-		/*保存本次准备写入的大小，后续接收文件数据时会用它判断总长度*/
+		/*保存本次准备写入的大小*/
 		app_write_size = write_size;
-		app_received_size = 0;
+		app_received_size = 0;			//清零已接收计数
+		app_page_index = 0;				//清空页缓冲区下标
+		app_flash_addr = APP_FLASH_START_ADDR;	//从起始地址开始写
 		app_write_ready = 1;
-		app_state = APP_STATE_RECEIVING;
 		
+		/*W25Q64写入前必须擦除扇区(NOR Flash只能1→0，不能0→1)
+		  扇区4KB，向下对齐到扇区边界*/
+		Serial_SendString("ERASING\r\n");
+		W25Q64_SectorErase(app_flash_addr);	//阻塞等待擦除完成
+		Serial_SendString("ERASE OK\r\n");
+		
+		app_state = APP_STATE_RECEIVING;
 		/*READY表示已经准备好接收后续原始数据字节*/
 		Serial_SendString("READY\r\n");
 	}
@@ -208,6 +223,28 @@ void App_HandleLine(char *line)
 		Serial_SendString(", DID=");
 		Serial_Printf("%04X", DID);
 		Serial_SendString("\r\n");
+	}
+	else if (strcmp(line, "READBACK") == 0)
+	{
+		/*从Flash读回刚才写入的数据，通过串口发回PC验证*/
+		uint32_t i;
+		if (app_write_ready)
+		{
+			Serial_SendString("DATA:\r\n");
+			/*分块读回：每次最多读256字节(页缓冲区大小)*/
+			for (i = 0; i < app_write_size; i += APP_PAGE_SIZE)
+			{
+				uint16_t chunk = app_write_size - i;
+				if (chunk > APP_PAGE_SIZE) chunk = APP_PAGE_SIZE;
+				W25Q64_ReadData(APP_FLASH_START_ADDR + i, app_page_buf, chunk);
+				Serial_SendArray(app_page_buf, chunk);
+			}
+			Serial_SendString("\r\nREADBACK OK\r\n");
+		}
+		else
+		{
+			Serial_SendString("NO DATA\r\n");
+		}
 	}
 	else
 	{
