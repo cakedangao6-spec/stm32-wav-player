@@ -61,7 +61,7 @@ int main(void)
 		{
 			if (App_GetState() == APP_STATE_RECEIVING)
 			{
-				if (ignore_next_lf && data == '\n')
+				if (ignore_next_lf && data == '\n')	//防止“\n”被当作字符数据处理
 				{
 					ignore_next_lf = 0;				//忽略WRITE命令后CRLF中的LF，避免把它算作数据
 				}

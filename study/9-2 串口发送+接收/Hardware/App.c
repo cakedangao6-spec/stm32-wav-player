@@ -36,18 +36,28 @@ uint32_t App_GetReceivedSize(void)
 
 /**
   * @brief  处理一个原始数据字节
-  * @param  data 收到的一个数据字节
+  * @param  data 收到的一个数据字节，存入页缓冲区
   * @retval 无
-  * @note   收到的数据字节数达到WRITE:size目标后，返回DONE并回到空闲状态。
+  * @note   每收到一个字节就写入页缓冲区；攒满256字节时自动调用W25Q64_PageProgram写入Flash。
+  *         注意：写Flash时阻塞等待Busy，但DMA仍在后台搬运，不会丢字节。
   */
 void App_HandleDataByte(uint8_t data)
 {
-	(void)data;
-	
 	if (app_state == APP_STATE_RECEIVING)
 	{
+		app_page_buf[app_page_index] = data;	//存入页缓冲区
+		app_page_index ++;
 		app_received_size ++;
-		
+
+		/*页缓冲区已满（256字节），整页写入Flash*/
+		if (app_page_index >= APP_PAGE_SIZE)
+		{
+			W25Q64_PageProgram(app_flash_addr, app_page_buf, APP_PAGE_SIZE);
+			app_flash_addr += APP_PAGE_SIZE;	//Flash地址后移一页
+			app_page_index = 0;					//清空页下标，从头攒下一页
+		}
+
+		/*收满WRITE:size指定的总字节数*/
 		if (app_received_size >= app_write_size)
 		{
 			app_state = APP_STATE_IDLE;
