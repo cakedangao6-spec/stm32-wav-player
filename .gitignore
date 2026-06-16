@@ -50,5 +50,13 @@ Thumbs.db
 音频素材/
 工具/XCOM V2.6/
 
+# Learning / scratch projects kept locally only
+study/
+study-2/
+MP3-Learn-01-Downloader/
+MP3-Learn-02-Player/
+MP3分模块学习总览.md
+UPLOAD_REPORT.md
+
 # Historical local backups
 **/归档/
